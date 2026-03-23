@@ -1,12 +1,22 @@
 pipeline {
     agent any
 
+    tools {
+        nodejs 'NodeJS'
+    }
+
     environment {
         NETLIFY_AUTH_TOKEN = credentials('netlify-auth-token-id')
         NETLIFY_SITE_ID = credentials('netlify-site-id')
     }
 
     stages {
+        stage('Check Node') {
+            steps {
+                sh 'node -v && npm -v'
+            }
+        }
+
         stage('Install') {
             steps {
                 sh 'npm install'
