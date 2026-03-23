@@ -1,22 +1,39 @@
 pipeline {
     agent any
-    tools {
-        nodejs 'NodeJS'
+
+    environment {
+        NETLIFY_AUTH_TOKEN = credentials('netlify-auth-token-id')
+        NETLIFY_SITE_ID = credentials('netlify-site-id')
     }
+
     stages {
         stage('Install') {
             steps {
                 sh 'npm install'
             }
         }
+
         stage('Test') {
             steps {
-                sh 'echo "No tests yet — skipping"'
+                sh 'npm run test'
             }
         }
-        stage('Done') {
+
+        stage('Build') {
             steps {
-                sh 'echo "Pipeline completed successfully!"'
+                sh 'npm run build'
+            }
+        }
+
+        stage('Deploy to Netlify') {
+            steps {
+                sh '''
+                npx netlify deploy \
+                  --prod \
+                  --dir=build \
+                  --site=$NETLIFY_SITE_ID \
+                  --auth=$NETLIFY_AUTH_TOKEN
+                '''
             }
         }
     }
